@@ -2,9 +2,9 @@ apply plugin: 'java'
 
 apply plugin: 'application'
 
-//apply plugin: 'checkstyle'
+apply plugin: 'checkstyle'
 
-apply plugin: 'jacoco'
+apply plugin: "info.solidsoft.pitest"
 
 repositories {
     jcenter()
@@ -19,4 +19,18 @@ mainClassName = 'fi.yussiv.squash.Main'
 
 run{
     standardInput = System.in
+}
+buildscript {
+    repositories {
+        mavenCentral()
+        //Needed only for SNAPSHOT versions
+        //maven { url "http://oss.sonatype.org/content/repositories/snapshots/" }
+    }
+    dependencies {
+        classpath 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.1.11'
+    }
+}
+pitest {
+    targetClasses = ['fi.yussiv.squash.*']
+    outputFormats = ['XML', 'HTML']
 }

@@ -1,14 +1,14 @@
 package fi.yussiv.squash;
 
-public class HuffmanNode {
+public class HuffmanTree {
 
     private Character value;
     private long count;
-    private HuffmanNode right;
-    private HuffmanNode left;
+    private HuffmanTree right;
+    private HuffmanTree left;
     private int depth;
 
-    public HuffmanNode(Character value, long count, HuffmanNode left, HuffmanNode right) {
+    public HuffmanTree(Character value, long count, HuffmanTree left, HuffmanTree right) {
         this.value = value;
         this.count = count;
         this.right = right;
@@ -23,20 +23,12 @@ public class HuffmanNode {
         return value;
     }
 
-    public HuffmanNode getRight() {
+    public HuffmanTree getRight() {
         return right;
     }
 
-    public HuffmanNode getLeft() {
+    public HuffmanTree getLeft() {
         return left;
-    }
-
-    public void setDepth(int depth) {
-        this.depth = depth;
-    }
-
-    public int getDepth() {
-        return depth;
     }
 
 }

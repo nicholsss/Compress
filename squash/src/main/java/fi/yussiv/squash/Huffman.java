@@ -6,56 +6,80 @@ import java.util.Map;
 import java.util.PriorityQueue;
 
 public class Huffman {
-    
-    public class EncodedPair {
-        HuffmanNode tree;
-        String contents;
-    }
 
-    public EncodedPair encode(String input) {
+    /**
+     * Generates a Huffman parse tree based on character frequencies.
+     *
+     * @param input the contents to be encoded
+     * @return
+     */
+    public HuffmanTree generateParseTree(String input) {
         Map<Character, Long> map = buildFrequencyMap(input);
-        PriorityQueue<HuffmanNode> nodes = new PriorityQueue<>(map.size(), (a, b) -> a.getCount() <= b.getCount() ? -1 : 1);
+        PriorityQueue<HuffmanTree> nodes = new PriorityQueue<>(map.size(), (a, b) -> a.getCount() <= b.getCount() ? -1 : 1);
         for (Character c : map.keySet()) {
-            nodes.add(new HuffmanNode(c, map.get(c), null, null));
+            nodes.add(new HuffmanTree(c, map.get(c), null, null));
         }
         while (nodes.size() > 1) {
-            HuffmanNode right = nodes.poll();
-            HuffmanNode left = nodes.poll();
+            HuffmanTree right = nodes.poll();
+            HuffmanTree left = nodes.poll();
 
-            HuffmanNode newRoot = new HuffmanNode(null, left.getCount() + right.getCount(), left, right);
+            HuffmanTree newRoot = new HuffmanTree(null, left.getCount() + right.getCount(), left, right);
             nodes.add(newRoot);
         }
-        HuffmanNode root = nodes.poll();
-        
-        Map<Character, String> bitMap = buildBitMap(root);
-        StringBuilder builder = new StringBuilder();
-        for(int i=0; i < input.length(); i++) {
-            builder.append(bitMap.get(input.charAt(i)));
-        }
-        EncodedPair ret = new EncodedPair();
-        ret.contents = builder.toString();
-        ret.tree = root;
-        return ret;
+
+        return nodes.poll();
     }
 
-    public String decode(String contents, HuffmanNode treeRoot) {
+    /**
+     * Encodes the given input using the given Huffman parse tree.
+     *
+     * @param input
+     * @param tree
+     * @return
+     */
+    public String encode(String input, HuffmanTree tree) {
+        Map<Character, String> bitMap = buildBitMap(tree);
         StringBuilder builder = new StringBuilder();
-        HuffmanNode current = treeRoot;
-        
+        for (int i = 0; i < input.length(); i++) {
+            builder.append(bitMap.get(input.charAt(i)));
+        }
+
+        return builder.toString();
+    }
+
+    /**
+     * Decodes the contents using the parse tree that was used to create the
+     * encoding.
+     *
+     * @param contents
+     * @param treeRoot
+     * @return
+     */
+    public String decode(String contents, HuffmanTree treeRoot) {
+        StringBuilder builder = new StringBuilder();
+        HuffmanTree current = treeRoot;
+
         for (int i = 0; i < contents.length(); i++) {
-            if(contents.charAt(i) == '0') {
+            if (contents.charAt(i) == '0') {
                 current = current.getLeft();
             } else {
                 current = current.getRight();
             }
-            if(current.getValue() != null) {
+            if (current.getValue() != null) {
                 builder.append(current.getValue());
                 current = treeRoot;
             }
         }
         return builder.toString();
     }
-    
+
+    /**
+     * Counts the occurances of each character in the input string that is to be
+     * encoded.
+     *
+     * @param str unencoded input string
+     * @return
+     */
     public Map<Character, Long> buildFrequencyMap(String str) {
         Map<Character, Long> map = new HashMap<>();
         for (int i = 0; i < str.length(); i++) {
@@ -69,14 +93,28 @@ public class Huffman {
         return map;
     }
 
-    public Map<Character, String> buildBitMap(HuffmanNode tree) {
+    /**
+     * Builds a map containing bit representations of Huffman codings of each
+     * character.
+     *
+     * @param tree
+     * @return
+     */
+    public Map<Character, String> buildBitMap(HuffmanTree tree) {
         Map<Character, String> map = new HashMap<>();
         walkTree(tree.getLeft(), map, "0");
         walkTree(tree.getRight(), map, "1");
         return map;
     }
 
-    private void walkTree(HuffmanNode node, Map<Character, String> map, String bits) {
+    /**
+     * Recursive helper method for the building of the bit representations.
+     * 
+     * @param node the current tree node
+     * @param map the map being built
+     * @param bits the bit representation built thus far based on edges traversed
+     */
+    private void walkTree(HuffmanTree node, Map<Character, String> map, String bits) {
         if (node == null) {
             return;
         }
@@ -88,10 +126,15 @@ public class Huffman {
         }
     }
 
-    private void printTree(HuffmanNode root) {
-        ArrayDeque<HuffmanNode> current = new ArrayDeque<>();
-        ArrayDeque<HuffmanNode> next = new ArrayDeque<>();
-        ArrayDeque<HuffmanNode> tmp;
+    /**
+     * A method to roughly visualize a Huffman parse tree.
+     * 
+     * @param root 
+     */
+    private void printTree(HuffmanTree root) {
+        ArrayDeque<HuffmanTree> current = new ArrayDeque<>();
+        ArrayDeque<HuffmanTree> next = new ArrayDeque<>();
+        ArrayDeque<HuffmanTree> tmp;
 
         System.out.println(root.getCount());
 
@@ -100,7 +143,7 @@ public class Huffman {
 
         while (true) {
             while (!current.isEmpty()) {
-                HuffmanNode node = current.poll();
+                HuffmanTree node = current.poll();
                 if (node.getValue() != null) {
                     System.out.print(node.getValue() + ":");
                 }
