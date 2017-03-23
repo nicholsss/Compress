@@ -1,0 +1,22 @@
+apply plugin: 'java'
+
+apply plugin: 'application'
+
+apply plugin: 'checkstyle'
+
+apply plugin: 'jacoco'
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile 'com.google.guava:guava:20.0'
+    testCompile 'junit:junit:4.12'
+}
+
+mainClassName = 'fi.yussiv.squash.Main'
+
+run{
+    standardInput = System.in
+}

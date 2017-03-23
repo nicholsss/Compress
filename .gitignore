@@ -1,1 +1,3 @@
 target/
+/squash/.nb-gradle/
+/squash/build/
