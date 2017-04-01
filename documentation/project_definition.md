@@ -4,7 +4,7 @@ The aim of the project is to implement several lossless compression algorithms i
 
 ### Algorithms and data structrures
 
-Huffman coding utilizes a tree and a priority queue. Lempel-Ziv encoding can utilize suffix trees or suffix arrays. 
+Huffman coding utilizes a tree and a priority queue. Lempel-Ziv encoding uses a search trie for its dictionary.
 
 ### Input and output
 
@@ -16,3 +16,4 @@ The input is any file and the output is a file that is hopefully substantially s
 * https://en.wikipedia.org/wiki/LZ77_and_LZ78
 * https://www.cs.helsinki.fi/courses/582487/2015/K/K/1
 * http://pwp.net.ipl.pt/cc.isel/arturj/Talks/Suffix.pdf
+* http://warp.povusers.org/EfficientLZW/S

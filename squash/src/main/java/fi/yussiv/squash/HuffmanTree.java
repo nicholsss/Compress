@@ -1,5 +1,8 @@
 package fi.yussiv.squash;
 
+/**
+ * Utility data structure used in the building of a huffman encoding/decoding dictionary.
+ */
 public class HuffmanTree {
 
     private Character value;
