@@ -1,18 +1,24 @@
-package fi.yussiv.squash;
+package fi.yussiv.squash.util;
 
 /**
  * Utility data structure used in the building of a huffman encoding/decoding dictionary.
  */
 public class HuffmanTree {
 
-    private Character value;
+    private byte value;
     private long count;
     private HuffmanTree right;
     private HuffmanTree left;
     private int depth;
 
-    public HuffmanTree(Character value, long count, HuffmanTree left, HuffmanTree right) {
+    public HuffmanTree(byte value) {
         this.value = value;
+        this.count = 0;
+        this.right = null;
+        this.left = null;
+    }
+    
+    public HuffmanTree(long count, HuffmanTree left, HuffmanTree right) {
         this.count = count;
         this.right = right;
         this.left = left;
@@ -22,7 +28,7 @@ public class HuffmanTree {
         return count;
     }
 
-    public Character getValue() {
+    public byte getValue() {
         return value;
     }
 
@@ -34,4 +40,7 @@ public class HuffmanTree {
         return left;
     }
 
+    public void incrementCount() {
+        count++;
+    }
 }

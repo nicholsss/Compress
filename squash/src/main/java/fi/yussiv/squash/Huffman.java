@@ -1,8 +1,9 @@
 package fi.yussiv.squash;
 
-import java.util.ArrayDeque;
-import java.util.HashMap;
-import java.util.Map;
+import fi.yussiv.squash.util.HuffmanCodeWord;
+import fi.yussiv.squash.util.HuffmanTree;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.PriorityQueue;
 
 public class Huffman {
@@ -13,17 +14,17 @@ public class Huffman {
      * @param input the contents to be encoded
      * @return
      */
-    public HuffmanTree generateParseTree(String input) {
-        Map<Character, Long> map = buildFrequencyMap(input);
-        PriorityQueue<HuffmanTree> nodes = new PriorityQueue<>(map.size(), (a, b) -> a.getCount() <= b.getCount() ? -1 : 1);
-        for (Character c : map.keySet()) {
-            nodes.add(new HuffmanTree(c, map.get(c), null, null));
-        }
+    public HuffmanTree generateParseTree(byte[] input) {
+        HuffmanTree[] byteOccurences = countByteOccurences(input);
+
+        PriorityQueue<HuffmanTree> nodes = new PriorityQueue<>(256, (a, b) -> a.getCount() <= b.getCount() ? -1 : 1);
+        nodes.addAll(Arrays.asList(byteOccurences));
+
         while (nodes.size() > 1) {
             HuffmanTree right = nodes.poll();
             HuffmanTree left = nodes.poll();
 
-            HuffmanTree newRoot = new HuffmanTree(null, left.getCount() + right.getCount(), left, right);
+            HuffmanTree newRoot = new HuffmanTree(left.getCount() + right.getCount(), left, right);
             nodes.add(newRoot);
         }
 
@@ -31,20 +32,49 @@ public class Huffman {
     }
 
     /**
-     * Encodes the given input using the given Huffman parse tree.
+     * Encodes the given input using the given Huffman parse tree. The first
+     * byte of the returned array is the effective length of the last byte.
      *
      * @param input
      * @param tree
-     * @return
+     * @return array of bytes, where the first byte contains the amount of effectives bits of the last byte
      */
-    public String encode(String input, HuffmanTree tree) {
-        Map<Character, String> bitMap = buildBitMap(tree);
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < input.length(); i++) {
-            builder.append(bitMap.get(input.charAt(i)));
+    public byte[] encode(byte[] input, HuffmanTree tree) {
+        HuffmanCodeWord[] codeArray = constructCodeArray(tree);
+        ArrayList<Byte> byteList = new ArrayList<>();
+        HuffmanCodeWord current;
+        short offset = 0;
+        byte nextByte = 0;
+
+        for (int i = 0; i < input.length; i++) {
+            current = codeArray[128 + input[i]];
+            for (int j = 0; j < current.size(); j++) {
+                if (offset < 8) {
+                    if (current.getBit(j)) {
+                        nextByte |= 1 << offset;
+                    }
+                    offset++;
+                } else {
+                    byteList.add(nextByte);
+                    nextByte = 0;
+                    if (current.getBit(j)) {
+                        nextByte = 1;
+                    }
+                    offset = 1;
+                }
+            }
+        }
+        // last byte onboard
+        byteList.add(nextByte);
+
+        byte[] output = new byte[byteList.size() + 1];
+        output[0] = (byte) (offset);
+        int i = 1;
+        for (Byte b : byteList) {
+            output[i++] = b;
         }
 
-        return builder.toString();
+        return output;
     }
 
     /**
@@ -55,114 +85,110 @@ public class Huffman {
      * @param treeRoot
      * @return
      */
-    public String decode(String contents, HuffmanTree treeRoot) {
-        StringBuilder builder = new StringBuilder();
+    public byte[] decode(byte[] input, HuffmanTree treeRoot) {
+        ArrayList<Byte> decodedBytes = new ArrayList<>();
         HuffmanTree current = treeRoot;
 
-        for (int i = 0; i < contents.length(); i++) {
-            if (contents.charAt(i) == '0') {
-                current = current.getLeft();
-            } else {
-                current = current.getRight();
+        // first byte is the length of the last byte
+        int lastByteLength = input[0];
+
+        int bits = 8;
+        for (int i = 1; i < input.length; i++) {
+            if (i == input.length - 1) {
+                // last byte
+                bits = lastByteLength;
             }
-            if (current.getValue() != null) {
-                builder.append(current.getValue());
-                current = treeRoot;
+            for (int j = 0; j < bits; j++) {
+                if (((1 << j) & input[i]) == 0) {
+                    current = current.getLeft();
+                } else {
+                    current = current.getRight();
+                }
+                // leaves have no children. Also, a Huffman tree is either full or empty, so it is only necessary to check one child.
+                if (current.getLeft() == null) {
+                    decodedBytes.add(current.getValue());
+                    current = treeRoot;
+                }
             }
+
         }
-        return builder.toString();
+        byte[] output = new byte[decodedBytes.size()];
+        int i = 0;
+        for (Byte b : decodedBytes) {
+            output[i++] = b;
+        }
+
+        return output;
     }
 
     /**
-     * Counts the occurances of each character in the input string that is to be
+     * Counts the occurances of each byte in the input byte array that is to be
      * encoded.
      *
-     * @param str unencoded input string
+     * @param bytes unencoded input byte array
      * @return
      */
-    public Map<Character, Long> buildFrequencyMap(String str) {
-        Map<Character, Long> map = new HashMap<>();
-        for (int i = 0; i < str.length(); i++) {
-            char c = str.charAt(i);
-            if (map.containsKey(c)) {
-                map.put(c, map.get(c) + 1);
-            } else {
-                map.put(c, 1L);
-            }
+    public HuffmanTree[] countByteOccurences(byte[] bytes) {
+        HuffmanTree[] occurrences = new HuffmanTree[256];
+        for (int i = 0; i < 256; i++) {
+            occurrences[i] = new HuffmanTree((byte) i);
         }
-        return map;
+        int idx = 0;
+        for (int i = 0; i < bytes.length; i++) {
+            idx = 0xff & bytes[i]; // translate byte to index
+            occurrences[idx].incrementCount();
+        }
+        return occurrences;
     }
 
     /**
-     * Builds a map containing bit representations of Huffman codings of each
-     * character.
+     * Builds an array containing the Huffman code words for each byte.
      *
      * @param tree
      * @return
      */
-    public Map<Character, String> buildBitMap(HuffmanTree tree) {
-        Map<Character, String> map = new HashMap<>();
-        walkTree(tree.getLeft(), map, "0");
-        walkTree(tree.getRight(), map, "1");
-        return map;
+    private HuffmanCodeWord[] constructCodeArray(HuffmanTree tree) {
+        HuffmanCodeWord[] codes = new HuffmanCodeWord[256];
+        HuffmanCodeWord code = new HuffmanCodeWord();
+
+        // traverse tree to the left
+        code.setBit(0, false);
+        walkTree(tree.getLeft(), codes, code);
+        // traverse tree to the right
+        code.setBit(0, true);
+        walkTree(tree.getRight(), codes, code);
+
+        return codes;
     }
 
     /**
      * Recursive helper method for the building of the bit representations.
-     * 
+     *
      * @param node the current tree node
      * @param map the map being built
-     * @param bits the bit representation built thus far based on edges traversed
+     * @param bits the bit representation built thus far based on edges
+     * traversed
      */
-    private void walkTree(HuffmanTree node, Map<Character, String> map, String bits) {
+    private void walkTree(HuffmanTree node, HuffmanCodeWord[] codes, HuffmanCodeWord code) {
         if (node == null) {
             return;
         }
-        if (node.getValue() != null) {
-            map.put(node.getValue(), bits);
+        if (node.getLeft() == null) {
+            try {
+                codes[128 + node.getValue()] = code.clone();
+            } catch (CloneNotSupportedException ex) {
+                System.err.println("Cloning code word failed");
+            }
         } else {
-            walkTree(node.getLeft(), map, bits + "0");
-            walkTree(node.getRight(), map, bits + "1");
-        }
-    }
+            int idx = code.size();
 
-    /**
-     * A method to roughly visualize a Huffman parse tree.
-     * 
-     * @param root 
-     */
-    private void printTree(HuffmanTree root) {
-        ArrayDeque<HuffmanTree> current = new ArrayDeque<>();
-        ArrayDeque<HuffmanTree> next = new ArrayDeque<>();
-        ArrayDeque<HuffmanTree> tmp;
+            code.setBit(idx, false);
+            walkTree(node.getLeft(), codes, code);
+            code.setBit(idx, true);
+            walkTree(node.getRight(), codes, code);
 
-        System.out.println(root.getCount());
-
-        current.add(root.getLeft());
-        current.add(root.getRight());
-
-        while (true) {
-            while (!current.isEmpty()) {
-                HuffmanTree node = current.poll();
-                if (node.getValue() != null) {
-                    System.out.print(node.getValue() + ":");
-                }
-                System.out.print(node.getCount() + " ");
-                if (node.getLeft() != null) {
-                    next.add(node.getLeft());
-                }
-                if (node.getRight() != null) {
-                    next.add(node.getRight());
-                }
-            }
-            System.out.println("");
-            if (next.isEmpty()) {
-                break;
-            }
-
-            tmp = current;
-            current = next;
-            next = tmp;
+            // going up in the recursion -> clear this depth
+            code.clearBit(idx);
         }
     }
 }

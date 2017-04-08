@@ -1,6 +1,8 @@
 package fi.yussiv.squash;
 
+import fi.yussiv.squash.util.HuffmanTree;
 import java.util.Map;
+import org.junit.Assert;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -15,31 +17,21 @@ public class HuffmanTest {
     }
 
     @Test
-    public void frequenciesAreCorrect() {
-        Map<Character, Long> frequencies = huff.buildFrequencyMap("aaabccbp");
-
-        assertEquals(3, (long) frequencies.get('a'));
-        assertEquals(2, (long) frequencies.get('b'));
-        assertEquals(2, (long) frequencies.get('c'));
-        assertEquals(1, (long) frequencies.get('p'));
-        assertNull(frequencies.get('d'));
-    }
-
-    @Test
     public void encodingCorrect() {
-        String str = "abcabaccaap";
-        String enc = huff.encode(str, huff.generateParseTree(str));
+        byte[] input = "abcabaccaap".getBytes();
+        byte[] encoded = huff.encode(input, huff.generateParseTree(input));
 
-        assertEquals("10100010101000011011", enc);
+        byte[] expected = new byte[]{3, 69, -123, 13};
+        assertArrayEquals(expected, encoded);
     }
 
     @Test
     public void encodedStringCanBeDecoded() {
-        String str = "testing";
-        HuffmanTree tree = huff.generateParseTree(str);
-        String enc = huff.encode(str, tree);
+        byte[] input = "testing".getBytes();
+        HuffmanTree tree = huff.generateParseTree(input);
+        byte[] encoded = huff.encode(input, tree);
         
-        assertNotEquals(str, enc);
-        assertEquals(str, huff.decode(enc, tree));
+        assertNotEquals(input, encoded);
+        assertArrayEquals(input, huff.decode(encoded, tree));
     }
 }
