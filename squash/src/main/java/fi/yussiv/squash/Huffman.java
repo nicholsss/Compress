@@ -1,11 +1,15 @@
 package fi.yussiv.squash;
 
-import fi.yussiv.squash.util.HuffmanCodeWord;
-import fi.yussiv.squash.util.HuffmanTree;
+import fi.yussiv.squash.domain.HuffmanCodeWord;
+import fi.yussiv.squash.domain.HuffmanTree;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.PriorityQueue;
 
+/**
+ * Compresses and decompresses input based on byte frequencies using Huffman
+ * coding.
+ */
 public class Huffman {
 
     /**
@@ -14,7 +18,7 @@ public class Huffman {
      * @param input the contents to be encoded
      * @return
      */
-    public HuffmanTree generateParseTree(byte[] input) {
+    public static HuffmanTree generateParseTree(byte[] input) {
         HuffmanTree[] byteOccurences = countByteOccurences(input);
 
         PriorityQueue<HuffmanTree> nodes = new PriorityQueue<>(256, (a, b) -> a.getCount() <= b.getCount() ? -1 : 1);
@@ -37,9 +41,10 @@ public class Huffman {
      *
      * @param input
      * @param tree
-     * @return array of bytes, where the first byte contains the amount of effectives bits of the last byte
+     * @return array of bytes, where the first byte contains the amount of
+     * effectives bits of the last byte
      */
-    public byte[] encode(byte[] input, HuffmanTree tree) {
+    public static byte[] encode(byte[] input, HuffmanTree tree) {
         HuffmanCodeWord[] codeArray = constructCodeArray(tree);
         ArrayList<Byte> byteList = new ArrayList<>();
         HuffmanCodeWord current;
@@ -85,7 +90,7 @@ public class Huffman {
      * @param treeRoot
      * @return
      */
-    public byte[] decode(byte[] input, HuffmanTree treeRoot) {
+    public static byte[] decode(byte[] input, HuffmanTree treeRoot) {
         ArrayList<Byte> decodedBytes = new ArrayList<>();
         HuffmanTree current = treeRoot;
 
@@ -128,7 +133,7 @@ public class Huffman {
      * @param bytes unencoded input byte array
      * @return
      */
-    public HuffmanTree[] countByteOccurences(byte[] bytes) {
+    public static HuffmanTree[] countByteOccurences(byte[] bytes) {
         HuffmanTree[] occurrences = new HuffmanTree[256];
         for (int i = 0; i < 256; i++) {
             occurrences[i] = new HuffmanTree((byte) i);
@@ -147,7 +152,7 @@ public class Huffman {
      * @param tree
      * @return
      */
-    private HuffmanCodeWord[] constructCodeArray(HuffmanTree tree) {
+    private static HuffmanCodeWord[] constructCodeArray(HuffmanTree tree) {
         HuffmanCodeWord[] codes = new HuffmanCodeWord[256];
         HuffmanCodeWord code = new HuffmanCodeWord();
 
@@ -169,7 +174,7 @@ public class Huffman {
      * @param bits the bit representation built thus far based on edges
      * traversed
      */
-    private void walkTree(HuffmanTree node, HuffmanCodeWord[] codes, HuffmanCodeWord code) {
+    private static void walkTree(HuffmanTree node, HuffmanCodeWord[] codes, HuffmanCodeWord code) {
         if (node == null) {
             return;
         }

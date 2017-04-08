@@ -1,4 +1,4 @@
-package fi.yussiv.squash.util;
+package fi.yussiv.squash.domain;
 
 import java.util.NoSuchElementException;
 

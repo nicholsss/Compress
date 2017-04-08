@@ -1,25 +1,27 @@
-package fi.yussiv.squash.util;
+package fi.yussiv.squash.domain;
 
 import java.util.Arrays;
 
 /**
  * Utitlity class to help with byte array manipulations.
- * Array size limited to a maximum of 8 elements.
+ * Array size limited to MAX_SIZE elements.
  */
 public class ByteArray {
 
-    public static final int MAX_SIZE = 8;
+    public static final int MAX_SIZE = 24;
     private final byte[] array;
     private int size;
 
     public ByteArray() {
-        this.array = new byte[8];
+        this.array = new byte[MAX_SIZE];
         this.size = 0;
     }
 
     public void add(byte b) {
         if (size < MAX_SIZE) {
             array[size++] = b;
+        } else {
+            System.err.println("byte array full!!!");
         }
     }
 

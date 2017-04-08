@@ -1,7 +1,7 @@
 package fi.yussiv.squash;
 
-import fi.yussiv.squash.util.ByteArray;
-import fi.yussiv.squash.util.LZWTrie;
+import fi.yussiv.squash.domain.ByteArray;
+import fi.yussiv.squash.domain.LZWTrie;
 import java.util.ArrayList;
 
 /**
@@ -12,9 +12,10 @@ public class LZW {
 
     /**
      * Encode given byte array with the LZW transform.
-     * http://warp.povusers.org/EfficientLZW/part1.html
+     * @param input
+     * @return 
      */
-    public byte[] encode(byte[] input) {
+    public static byte[] encode(byte[] input) {
         LZWTrie dictionary = new LZWTrie();
         ByteArray prefix = new ByteArray();
         ArrayList<Byte> output = new ArrayList<>();
@@ -41,9 +42,11 @@ public class LZW {
     /**
      * Decode byte array produced by the encoder back to the original byte
      * array. 
-     * http://warp.povusers.org/EfficientLZW/part5.html
+     * 
+     * @param input byte array of encoded data
+     * @return decoded byte array
      */
-    public byte[] decode(byte[] input) {
+    public static byte[] decode(byte[] input) {
         ArrayList<byte[]> dictionary = new ArrayList<>(512);
         byte i = Byte.MIN_VALUE;
         while (true) {
@@ -55,14 +58,14 @@ public class LZW {
         }
         ArrayList<Byte> output = new ArrayList<>();
 
-        int index = Byte.toUnsignedInt(input[0]) << 8 | Byte.toUnsignedInt(input[1]);
+        int index = Byte.toUnsignedInt(input[0]) << 16 | Byte.toUnsignedInt(input[1]) << 8 | Byte.toUnsignedInt(input[2]);
         int old = index;
         addBytes(output, dictionary.get(index));
         byte postfix;
 
-        for (int j = 2; j < input.length; j += 2) {
+        for (int j = 3; j < input.length; j += 3) {
             // parse index from two bytes
-            index = Byte.toUnsignedInt(input[j]) << 8 | Byte.toUnsignedInt(input[j + 1]);
+            index = Byte.toUnsignedInt(input[j]) << 16 | Byte.toUnsignedInt(input[j + 1]) << 8 | Byte.toUnsignedInt(input[j + 2]);
             if (dictionary.size() > index) {
                 addBytes(output, dictionary.get(index));
 
@@ -88,7 +91,7 @@ public class LZW {
         return out;
     }
 
-    private byte[] concatenateBytes(byte[] bytes, byte addendum) {
+    private static byte[] concatenateBytes(byte[] bytes, byte addendum) {
         byte[] out = new byte[bytes.length + 1];
         for (int i = 0; i < bytes.length; i++) {
             out[i] = bytes[i];
@@ -97,15 +100,17 @@ public class LZW {
         return out;
     }
 
-    private void addBytes(ArrayList<Byte> list, byte[] bytes) {
+    private static void addBytes(ArrayList<Byte> list, byte[] bytes) {
         for (int i = 0; i < bytes.length; i++) {
             list.add(bytes[i]);
         }
     }
 
-    private void addBytes(ArrayList<Byte> list, int codeWord) {
-        int shifted = codeWord >> 8;
-        list.add((byte) shifted);
+    private static void addBytes(ArrayList<Byte> list, int codeWord) {
+        int middle = codeWord >> 8;
+        int last = middle >> 8;
+        list.add((byte) last);
+        list.add((byte) middle);
         list.add((byte) codeWord);
     }
 }

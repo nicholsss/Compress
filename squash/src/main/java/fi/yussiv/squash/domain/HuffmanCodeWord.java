@@ -1,4 +1,4 @@
-package fi.yussiv.squash.util;
+package fi.yussiv.squash.domain;
 
 import java.util.BitSet;
 
@@ -7,10 +7,10 @@ import java.util.BitSet;
  */
 public class HuffmanCodeWord {
 
-    private BitSet bits;
-
-    // BitSet doesn't count leading zeroes, so we keep track of bits that are in use
-    private BitSet activeBits; 
+    private final BitSet bits;
+    // BitSet's length() method doesn't count leading zeroes, so we'll use another 
+    // instance to keep track of the bits that are in use
+    private final BitSet activeBits;
 
     public HuffmanCodeWord() {
         this.bits = new BitSet();
@@ -33,7 +33,7 @@ public class HuffmanCodeWord {
         bits.set(index, isSet);
         activeBits.set(index);
     }
-    
+
     public void clearBit(int index) {
         activeBits.clear(index);
     }
@@ -55,9 +55,9 @@ public class HuffmanCodeWord {
     public int size() {
         return activeBits.length();
     }
-    
+
     @Override
     public HuffmanCodeWord clone() throws CloneNotSupportedException {
-        return new HuffmanCodeWord((BitSet)bits.clone(), (BitSet)activeBits.clone());
+        return new HuffmanCodeWord((BitSet) bits.clone(), (BitSet) activeBits.clone());
     }
 }

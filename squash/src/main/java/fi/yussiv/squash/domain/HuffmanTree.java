@@ -1,9 +1,11 @@
-package fi.yussiv.squash.util;
+package fi.yussiv.squash.domain;
+
+import java.io.Serializable;
 
 /**
  * Utility data structure used in the building of a huffman encoding/decoding dictionary.
  */
-public class HuffmanTree {
+public class HuffmanTree implements Serializable {
 
     private byte value;
     private long count;

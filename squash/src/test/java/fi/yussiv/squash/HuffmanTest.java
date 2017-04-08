@@ -1,37 +1,28 @@
 package fi.yussiv.squash;
 
-import fi.yussiv.squash.util.HuffmanTree;
-import java.util.Map;
+import fi.yussiv.squash.domain.HuffmanTree;
 import org.junit.Assert;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.junit.Before;
 
 public class HuffmanTest {
-
-    private Huffman huff;
-
-    @Before
-    public void somethingToBeginWith() {
-        huff = new Huffman();
-    }
 
     @Test
     public void encodingCorrect() {
         byte[] input = "abcabaccaap".getBytes();
-        byte[] encoded = huff.encode(input, huff.generateParseTree(input));
+        byte[] encoded = Huffman.encode(input, Huffman.generateParseTree(input));
 
-        byte[] expected = new byte[]{3, 69, -123, 13};
+        byte[] expected = new byte[]{5, 69, -123, 13};
         assertArrayEquals(expected, encoded);
     }
 
     @Test
     public void encodedStringCanBeDecoded() {
-        byte[] input = "testing".getBytes();
-        HuffmanTree tree = huff.generateParseTree(input);
-        byte[] encoded = huff.encode(input, tree);
+        byte[] input = "testing testing, how about some non-ascii characters? üäåëéa".getBytes();
+        HuffmanTree tree = Huffman.generateParseTree(input);
+        byte[] encoded = Huffman.encode(input, tree);
         
         assertNotEquals(input, encoded);
-        assertArrayEquals(input, huff.decode(encoded, tree));
+        assertArrayEquals(input, Huffman.decode(encoded, tree));
     }
 }
