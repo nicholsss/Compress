@@ -4,7 +4,7 @@ The aim of the project is to implement several lossless compression algorithms i
 
 ### Algorithms and data structrures
 
-Huffman coding utilizes a tree and a priority queue. Lempel-Ziv encoding uses a search trie for its dictionary.
+Huffman coding utilizes a tree structure for a dictionary and a minimum heap for constructing it. Lempel-Ziv encoding uses a search trie for its dictionary.
 
 ### Input and output
 

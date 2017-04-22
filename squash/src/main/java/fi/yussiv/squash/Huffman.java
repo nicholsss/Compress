@@ -2,9 +2,8 @@ package fi.yussiv.squash;
 
 import fi.yussiv.squash.domain.HuffmanCodeWord;
 import fi.yussiv.squash.domain.HuffmanTree;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.PriorityQueue;
+import fi.yussiv.squash.domain.MinHeap;
+import fi.yussiv.squash.util.ByteArray;
 
 /**
  * Compresses and decompresses input based on byte frequencies using Huffman
@@ -21,8 +20,10 @@ public class Huffman {
     public static HuffmanTree generateParseTree(byte[] input) {
         HuffmanTree[] byteOccurences = countByteOccurences(input);
 
-        PriorityQueue<HuffmanTree> nodes = new PriorityQueue<>(256, (a, b) -> a.getCount() <= b.getCount() ? -1 : 1);
-        nodes.addAll(Arrays.asList(byteOccurences));
+        MinHeap nodes = new MinHeap();
+        for (HuffmanTree tree : byteOccurences) {
+            nodes.add(tree);
+        }
 
         while (nodes.size() > 1) {
             HuffmanTree right = nodes.poll();
@@ -46,10 +47,11 @@ public class Huffman {
      */
     public static byte[] encode(byte[] input, HuffmanTree tree) {
         HuffmanCodeWord[] codeArray = constructCodeArray(tree);
-        ArrayList<Byte> byteList = new ArrayList<>();
+        ByteArray byteList = new ByteArray();
         HuffmanCodeWord current;
         short offset = 0;
         byte nextByte = 0;
+        byteList.add((byte) (offset)); // reserve space for offset
 
         for (int i = 0; i < input.length; i++) {
             current = codeArray[128 + input[i]];
@@ -71,27 +73,22 @@ public class Huffman {
         }
         // last byte onboard
         byteList.add(nextByte);
+        // update offset to the actual value
+        byteList.set(0, (byte) (offset));
 
-        byte[] output = new byte[byteList.size() + 1];
-        output[0] = (byte) (offset);
-        int i = 1;
-        for (Byte b : byteList) {
-            output[i++] = b;
-        }
-
-        return output;
+        return byteList.getBytes();
     }
 
     /**
      * Decodes the contents using the parse tree that was used to create the
      * encoding.
      *
-     * @param contents
+     * @param input
      * @param treeRoot
      * @return
      */
     public static byte[] decode(byte[] input, HuffmanTree treeRoot) {
-        ArrayList<Byte> decodedBytes = new ArrayList<>();
+        ByteArray decodedBytes = new ByteArray();
         HuffmanTree current = treeRoot;
 
         // first byte is the length of the last byte
@@ -117,13 +114,8 @@ public class Huffman {
             }
 
         }
-        byte[] output = new byte[decodedBytes.size()];
-        int i = 0;
-        for (Byte b : decodedBytes) {
-            output[i++] = b;
-        }
 
-        return output;
+        return decodedBytes.getBytes();
     }
 
     /**

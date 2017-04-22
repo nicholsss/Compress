@@ -7,8 +7,10 @@ import java.util.NoSuchElementException;
  */
 public class LZWTrie {
 
+    private static final int CODEWORD_MAX_LENGTH = 24;
+
     private TrieNode[] root;
-    private int count; // the counter that is used to add new code words
+    private int size;
 
     /**
      * Initializes the root level of the trie. As bytes are 8 bits, it always
@@ -25,7 +27,7 @@ public class LZWTrie {
             }
             b++;
         }
-        this.count = 256;
+        this.size = 256;
     }
 
     /**
@@ -34,7 +36,7 @@ public class LZWTrie {
      * @param bytes
      * @return codeword as 32bit integer value
      */
-    public int getCodeWord(ByteArray bytes) {
+    public int getCodeWord(LZWCodeWord bytes) {
         if (bytes.size() == 0) {
             throw new IllegalArgumentException("Byte string must not be empty");
         }
@@ -49,7 +51,7 @@ public class LZWTrie {
         return node.getCodeWord();
     }
 
-    public boolean contains(ByteArray bytes, byte postfix) {
+    public boolean contains(LZWCodeWord bytes, byte postfix) {
         if (bytes.size() == 0) {
             return true; // if bytes is empty, we are on the root level, which is always populated
         }
@@ -65,12 +67,29 @@ public class LZWTrie {
         return true;
     }
 
-    public void add(ByteArray bytes, byte postfix) {
+    public boolean add(LZWCodeWord bytes, byte postfix) {
+        if (bytes.size() == CODEWORD_MAX_LENGTH) {
+//            System.err.println("maximum length reached!");
+            return false;
+        }
         TrieNode node = traverseTree(bytes);
-        node.addChild(postfix, count++);
+        // the size of the trie acts as the next codeword for the trie node
+        node.addChild(postfix, size++);
+        return true;
     }
 
-    private TrieNode traverseTree(ByteArray bytes) {
+    public int size() {
+        return size;
+    }
+
+    /**
+     * Walks through the trie structure based on the codeword bytes and returns
+     * the element it ends up pointing to.
+     *
+     * @param bytes
+     * @return
+     */
+    private TrieNode traverseTree(LZWCodeWord bytes) {
         TrieNode current = root[128 + bytes.get(0)]; // byte value range [-128, 127], indexes start from 0
         for (int i = 1; i < bytes.size(); i++) {
             current = current.getChild(bytes.get(i));
