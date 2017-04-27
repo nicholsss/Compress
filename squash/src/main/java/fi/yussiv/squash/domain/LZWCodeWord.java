@@ -22,13 +22,12 @@ public class LZWCodeWord {
             array[size++] = b;
             return true;
         } else {
-//            System.err.println("codeword array full!!!");
             return false;
         }
     }
 
     public byte get(int index) {
-        if (index >= size && index < 0) {
+        if (index >= size || index < 0) {
             throw new ArrayIndexOutOfBoundsException();
         }
 

@@ -171,11 +171,7 @@ public class Huffman {
             return;
         }
         if (node.getLeft() == null) {
-            try {
-                codes[128 + node.getValue()] = code.clone();
-            } catch (CloneNotSupportedException ex) {
-                System.err.println("Cloning code word failed");
-            }
+            codes[128 + node.getValue()] = code.duplicate();
         } else {
             int idx = code.size();
 

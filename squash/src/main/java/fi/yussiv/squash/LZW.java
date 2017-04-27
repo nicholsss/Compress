@@ -10,11 +10,13 @@ import fi.yussiv.squash.util.LZWCodeWordArray;
  * strings.
  */
 public class LZW {
+
     public static final int DEFAULT_DICTIONARY_SIZE = 65536;
 
     public static byte[] encode(byte[] input) {
         return encode(input, DEFAULT_DICTIONARY_SIZE);
     }
+
     /**
      * Encode given byte array with the LZW transform.
      *
@@ -32,7 +34,7 @@ public class LZW {
                 prefix.add(input[i]);
             } else {
                 addBytes(output, dictionary.getCodeWord(prefix));
-                if(!dictionary.add(prefix, input[i])){
+                if (!dictionary.add(prefix, input[i])) {
                     // codeword maximum length reached, reset dictionary
                     dictionary = new LZWTrie();
                 }
@@ -49,14 +51,15 @@ public class LZW {
 
         return output.getBytes();
     }
-    
+
     public static byte[] decode(byte[] input) {
         return decode(input, DEFAULT_DICTIONARY_SIZE);
     }
+
     /**
      * Decode byte array produced by the encoder back to the original byte
-     * array.
-     * The dictionary size must match the value the data was encoded with.
+     * array. The dictionary size must match the value the data was encoded
+     * with.
      *
      * @param input byte array of encoded data
      * @param dictionarySize maximum amound of codewords used in encoding
@@ -64,7 +67,7 @@ public class LZW {
      */
     public static byte[] decode(byte[] input, int dictionarySize) {
         LZWCodeWordArray dictionary = new LZWCodeWordArray();
-        
+
         ByteArray output = new ByteArray();
 
         int index = Byte.toUnsignedInt(input[0]) << 16 | Byte.toUnsignedInt(input[1]) << 8 | Byte.toUnsignedInt(input[2]);
@@ -80,7 +83,7 @@ public class LZW {
 
                 postfix = dictionary.get(index).getBytes()[0];
                 LZWCodeWord bytes = dictionary.get(old).concatenate(postfix);
-                if(bytes != null) {
+                if (bytes != null) {
                     dictionary.add(bytes);
                 } else {
                     dictionary.reset();
@@ -94,7 +97,7 @@ public class LZW {
             }
             old = index;
             // reset dictionary to the base set
-            if(dictionarySize == dictionary.size()) {
+            if (dictionarySize == dictionary.size()) {
                 dictionary.reset();
 //                System.err.println("reset dos");
             }

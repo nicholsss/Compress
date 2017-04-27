@@ -6,26 +6,29 @@ import fi.yussiv.squash.io.HuffmanWrapper;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import ui.GUI;
+import static ui.GUI.run;
 
 public class Main {
 
     public static void main(String[] args) throws UnsupportedEncodingException, FileNotFoundException, IOException, ClassNotFoundException {
         System.out.println("Let's squash some files, shall we?");
         //encodeTestFile();
-        timeTest();
+        //timeTest();
+        run(new GUI(), 500, 250);
     }
-    
+
     public static void timeTest() {
         String filename = "test.txt";
         byte[] input = readBytesFromFile(filename);
-        
+
         runAndPrintResult(input, 1024);
         runAndPrintResult(input, 4096);
         runAndPrintResult(input, 16384);
         runAndPrintResult(input, 65536);
         runAndPrintResult(input, 262144);
         runAndPrintResult(input, 1048576);
-        
+
         runAndPrintResult(truncateBytes(input, 1024), 65536);
         runAndPrintResult(truncateBytes(input, 2048), 65536);
         runAndPrintResult(truncateBytes(input, 4096), 65536);
@@ -38,7 +41,7 @@ public class Main {
         runAndPrintResult(truncateBytes(input, 524288), 65536);
         runAndPrintResult(truncateBytes(input, 1048576), 65536);
     }
-    
+
     public static byte[] truncateBytes(byte[] bytes, int length) {
         byte[] out = new byte[length];
         for (int i = 0; i < length; i++) {
@@ -46,16 +49,16 @@ public class Main {
         }
         return out;
     }
-    
+
     public static void runAndPrintResult(byte[] input, int dictionarySize) {
-        
+
         long start = System.nanoTime();
         byte[] encoded = LZW.encode(input, dictionarySize);
         LZW.decode(encoded, dictionarySize);
         long end = System.nanoTime();
-        System.out.println("Dictionary size:" + dictionarySize + "\tinput size:" + input.length + "  \tencoded size:" + encoded.length + "\ttime:" + (end-start)/1000 + " us");
+        System.out.println("Dictionary size:" + dictionarySize + "\tinput size:" + input.length + "  \tencoded size:" + encoded.length + "\ttime:" + (end - start) / 1000 + " us");
     }
-    
+
     public static void encodeTestFile() {
         String filename = "test.txt";
         System.out.println("");

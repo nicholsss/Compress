@@ -11,7 +11,6 @@ public class HuffmanTree implements Serializable {
     private long count;
     private HuffmanTree right;
     private HuffmanTree left;
-    private int depth;
 
     public HuffmanTree(byte value) {
         this.value = value;
