@@ -6,8 +6,8 @@ import fi.yussiv.squash.io.HuffmanWrapper;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import ui.GUI;
-import static ui.GUI.run;
+import fi.yussiv.squash.ui.GUI;
+import static fi.yussiv.squash.ui.GUI.run;
 
 public class Main {
 
@@ -15,7 +15,7 @@ public class Main {
         System.out.println("Let's squash some files, shall we?");
         //encodeTestFile();
         //timeTest();
-        run(new GUI(), 500, 250);
+        run(new GUI(), 600, 250);
     }
 
     public static void timeTest() {
@@ -59,7 +59,7 @@ public class Main {
         System.out.println("Dictionary size:" + dictionarySize + "\tinput size:" + input.length + "  \tencoded size:" + encoded.length + "\ttime:" + (end - start) / 1000 + " us");
     }
 
-    public static void encodeTestFile() {
+    public static void encodeTestFile() throws IOException {
         String filename = "test.txt";
         System.out.println("");
         System.out.println("--Huffman--");

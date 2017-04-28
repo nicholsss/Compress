@@ -23,9 +23,9 @@ public class FileIO {
                 BufferedInputStream buff = new BufferedInputStream(file);
                 ObjectInputStream in = new ObjectInputStream(buff);) {
             Object obj = in.readObject();
-            
+
             in.close();
-            
+
             return obj;
 
         } catch (FileNotFoundException ex) {
@@ -35,34 +35,25 @@ public class FileIO {
         }
         return null;
     }
-    
-    public static boolean writeObjectToFile(String filename, Object obj) {
+
+    public static void writeObjectToFile(String filename, Object obj) throws FileNotFoundException, IOException {
         try (
                 FileOutputStream file = new FileOutputStream(filename);
                 BufferedOutputStream buff = new BufferedOutputStream(file);
                 ObjectOutputStream out = new ObjectOutputStream(buff);) {
-            
+
             out.writeObject(obj);
             out.close();
-            
-            return true;
-
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(FileIO.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(FileIO.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        return false;
     }
-    
+
     public static byte[] readBytesFromFile(String filename) {
         try (
                 FileInputStream file = new FileInputStream(filename);
                 BufferedInputStream buff = new BufferedInputStream(file);) {
-            
+
             byte[] in = IOUtils.toByteArray(buff);
-            
+
             return in;
 
         } catch (FileNotFoundException ex) {
@@ -72,22 +63,13 @@ public class FileIO {
         }
         return null;
     }
-    
-    public static boolean writeBytesToFile(String filename, byte[] bytes) {
+
+    public static void writeBytesToFile(String filename, byte[] bytes) throws FileNotFoundException, IOException {
         try (
                 FileOutputStream file = new FileOutputStream(filename);
                 BufferedOutputStream buff = new BufferedOutputStream(file);) {
-            
-            IOUtils.write(bytes, buff);
-            
-            return true;
 
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(FileIO.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(FileIO.class.getName()).log(Level.SEVERE, null, ex);
+            IOUtils.write(bytes, buff);
         }
-        
-        return false;
     }
 }

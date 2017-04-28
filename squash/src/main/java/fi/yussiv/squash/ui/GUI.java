@@ -1,4 +1,4 @@
-package ui;
+package fi.yussiv.squash.ui;
 
 import fi.yussiv.squash.Huffman;
 import fi.yussiv.squash.LZW;
@@ -124,24 +124,34 @@ public class GUI extends JFrame {
 
         public void actionPerformed(ActionEvent e) {
             byte[] input = FileIO.readBytesFromFile(inputFile.getText());
+            byte[] output;
+            HuffmanTree ht = null;
             if (encode.isSelected()) {
                 if (lzw.isSelected()) {
-                    byte[] output = LZW.encode(input);
-                    printOutputText("Encoded size " + output.length + " bytes");
+                    output = LZW.encode(input);
                 } else {
-                    HuffmanTree ht = Huffman.generateParseTree(input);
-                    byte[] output = Huffman.encode(input, ht);
-                    printOutputText("Encoded size " + output.length + " bytes");
+                    ht = Huffman.generateParseTree(input);
+                    output = Huffman.encode(input, ht);
                 }
+                printOutputText("Encoded size " + output.length + " bytes");
             } else {
-                if(lzw.isSelected()) {
-                    byte[] output = LZW.decode(input);
-                    printOutputText("Decoded size " + output.length + " bytes");
+                if (lzw.isSelected()) {
+                    output = LZW.decode(input);
                 } else {
                     HuffmanWrapper hw = (HuffmanWrapper) FileIO.readObjectFromFile(inputFile.getText());
-                    byte[] output = Huffman.decode(hw.data, hw.tree);
-                    printOutputText("Decoded size " + output.length + " bytes");
+                    output = Huffman.decode(hw.data, hw.tree);
                 }
+                printOutputText("Decoded size " + output.length + " bytes");
+            }
+
+            try {
+                if (huffman.isSelected() && encode.isSelected()) {
+                    FileIO.writeObjectToFile(outputFile.getText(), new HuffmanWrapper(output, ht));
+                } else {
+                    FileIO.writeBytesToFile(outputFile.getText(), output);
+                }
+            } catch (Exception ex) {
+                printOutputText("Could not write to file: " + ex.getMessage());
             }
         }
     }
