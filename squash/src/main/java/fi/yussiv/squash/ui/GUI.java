@@ -6,7 +6,6 @@ import fi.yussiv.squash.domain.HuffmanTree;
 import fi.yussiv.squash.io.FileIO;
 import fi.yussiv.squash.io.HuffmanFile;
 import fi.yussiv.squash.io.HuffmanParser;
-import fi.yussiv.squash.io.HuffmanWrapper;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,7 +18,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -32,15 +30,17 @@ import javax.swing.SwingConstants;
  */
 public class GUI extends JFrame {
 
-    private JTextField inputFile = new JTextField(), outputFile = new JTextField();
+    private JTextField inputFile = new JTextField();
+    private JTextField outputFile = new JTextField();
 
-    private JButton open = new JButton("Input"), save = new JButton("Output");
-    private JRadioButton huffman;
-    private JRadioButton lzw;
-    private JRadioButton encode;
-    private JRadioButton decode;
-    private JTextArea inputInfo;
-    private JTextArea outputInfo;
+    private JButton open = new JButton("Input");
+    private JButton save = new JButton("Output");
+    private JRadioButton huffman = new JRadioButton("Huffman");
+    private JRadioButton lzw = new JRadioButton("LZW");
+    private JRadioButton encode = new JRadioButton("Encode");
+    private JRadioButton decode = new JRadioButton("Decode");
+    private JTextArea inputInfo = new JTextArea(5, 20);
+    private JTextArea outputInfo = new JTextArea(5, 20);
 
     public GUI() {
         Container cp = getContentPane();
@@ -58,7 +58,6 @@ public class GUI extends JFrame {
         JPanel rightPanel = new JPanel();
         rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
 
-        JPanel p = new JPanel();
         open.addActionListener(new InputFileChooserListener());
         save.addActionListener(new OutputFileChooserListener());
         open.setHorizontalAlignment(SwingConstants.LEFT);
@@ -67,31 +66,17 @@ public class GUI extends JFrame {
         leftPanel.add(open);
         rightPanel.add(save);
 
-//        inputFile.setEditable(false);
-//        outputFile.setEditable(false);
-
         leftPanel.add(inputFile);
         rightPanel.add(outputFile);
-
-        p = new JPanel();
-
-        inputInfo = new JTextArea(5, 20);
-        JScrollPane scrollPane = new JScrollPane(inputInfo);
+        
         inputInfo.setEditable(false);
-
-        outputInfo = new JTextArea(5, 20);
-        JScrollPane scrollPane2 = new JScrollPane(inputInfo);
         outputInfo.setEditable(false);
 
         leftPanel.add(inputInfo);
         rightPanel.add(outputInfo);
 
         ButtonGroup codingScheme = new ButtonGroup();
-        huffman = new JRadioButton("Huffman");
-        lzw = new JRadioButton("LZW");
         ButtonGroup actions = new ButtonGroup();
-        encode = new JRadioButton("Encode");
-        decode = new JRadioButton("Decode");
 
         codingScheme.add(lzw);
         codingScheme.add(huffman);
@@ -99,11 +84,11 @@ public class GUI extends JFrame {
         actions.add(decode);
         encode.setSelected(true);
         lzw.setSelected(true);
-        
+
         actionPanel.add(new JLabel("Action: "));
         actionPanel.add(encode);
         actionPanel.add(decode);
-        
+
         methodPanel.add(new JLabel("Method: "));
         methodPanel.add(lzw);
         methodPanel.add(huffman);
@@ -181,17 +166,15 @@ public class GUI extends JFrame {
     }
 
     class InputFileChooserListener implements ActionListener {
-
         public void actionPerformed(ActionEvent e) {
             JFileChooser c = new JFileChooser();
-            // Demonstrate "Open" dialog:
             int rVal = c.showOpenDialog(GUI.this);
             if (rVal == JFileChooser.APPROVE_OPTION) {
                 String filename = c.getSelectedFile().getAbsolutePath();
                 inputFile.setText(filename);
                 try {
-                byte[] input = FileIO.readBytesFromFile(filename);
-                printInputText("File size: " + input.length + " bytes");
+                    byte[] input = FileIO.readBytesFromFile(filename);
+                    printInputText("File size: " + input.length + " bytes");
                 } catch (Exception ex) {
                     printInputText("Opening file failed: " + ex.getMessage());
                 }
@@ -200,10 +183,8 @@ public class GUI extends JFrame {
     }
 
     class OutputFileChooserListener implements ActionListener {
-
         public void actionPerformed(ActionEvent e) {
             JFileChooser c = new JFileChooser();
-            // Demonstrate "Save" dialog:
             int rVal = c.showSaveDialog(GUI.this);
             if (rVal == JFileChooser.APPROVE_OPTION) {
                 outputFile.setText(c.getSelectedFile().getAbsolutePath());

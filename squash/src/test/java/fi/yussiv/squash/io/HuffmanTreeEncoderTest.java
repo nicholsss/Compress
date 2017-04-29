@@ -23,7 +23,7 @@ public class HuffmanTreeEncoderTest {
     }
 
     @Test
-    public void testEncode() {
+    public void testEncode() throws Exception {
         HuffmanTree root = new HuffmanTree(
                 0, 
                 new HuffmanTree((byte) 5),
