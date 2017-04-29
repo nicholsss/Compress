@@ -2,23 +2,27 @@ package fi.yussiv.squash;
 
 import static fi.yussiv.squash.io.FileIO.*;
 import fi.yussiv.squash.domain.HuffmanTree;
+import fi.yussiv.squash.io.HuffmanFile;
+import fi.yussiv.squash.io.HuffmanParser;
 import fi.yussiv.squash.io.HuffmanWrapper;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import fi.yussiv.squash.ui.GUI;
 import static fi.yussiv.squash.ui.GUI.run;
+import java.util.Arrays;
 
 public class Main {
 
-    public static void main(String[] args) throws UnsupportedEncodingException, FileNotFoundException, IOException, ClassNotFoundException {
+    public static void main(String[] args) throws Exception {
         System.out.println("Let's squash some files, shall we?");
-        //encodeTestFile();
-        //timeTest();
         run(new GUI(), 600, 250);
+//        encodeHuff();
+//        encodeLZW();
+        //timeTest();
     }
 
-    public static void timeTest() {
+    public static void timeTest() throws IOException {
         String filename = "test.txt";
         byte[] input = readBytesFromFile(filename);
 
@@ -59,33 +63,8 @@ public class Main {
         System.out.println("Dictionary size:" + dictionarySize + "\tinput size:" + input.length + "  \tencoded size:" + encoded.length + "\ttime:" + (end - start) / 1000 + " us");
     }
 
-    public static void encodeTestFile() throws IOException {
+    public static void encodeLZW() throws IOException {
         String filename = "test.txt";
-        System.out.println("");
-        System.out.println("--Huffman--");
-
-        byte[] input = readBytesFromFile(filename);
-        System.out.println("Input size: " + input.length + " bytes");
-
-        HuffmanTree tree = Huffman.generateParseTree(input);
-        byte[] encoded = Huffman.encode(input, tree);
-        System.out.println("Encoded size: " + encoded.length + " bytes");
-
-        // save file
-        HuffmanWrapper hw = new HuffmanWrapper(encoded, tree);
-        writeObjectToFile("out/encoded.huff", hw);
-        System.out.println(">> Saved to out/encoded.huff");
-
-        System.out.println("\n<< Reading from out/encoded.huff");
-        HuffmanWrapper readHw = (HuffmanWrapper) readObjectFromFile("out/encoded.huff");
-
-        byte[] decoded = Huffman.decode(readHw.data, readHw.tree);
-        System.out.println("Decoded size: " + decoded.length + " bytes");
-
-        writeBytesToFile("out/decoded.huff.txt", decoded);
-        System.out.println(">> Saved to out/decoded.huff.txt");
-
-        System.out.println("");
         System.out.println("--LZW--");
 
         byte[] inputLZW = readBytesFromFile(filename);
@@ -105,6 +84,36 @@ public class Main {
 
         writeBytesToFile("out/decoded.lzw.txt", decodedLZW);
         System.out.println(">> Saved to out/decoded.lzw.txt");
+    }
+
+    public static void encodeHuff() throws Exception {
+        String filename = "test.txt";
+        System.out.println("");
+        System.out.println("--Huffman--");
+
+        byte[] input = readBytesFromFile(filename);
+        System.out.println("Input size: " + input.length + " bytes");
+
+        HuffmanTree tree = Huffman.generateParseTree(input);
+        byte[] encoded = Huffman.encode(input, tree);
+        System.out.println("Encoded size: " + encoded.length + " bytes");
+
+        // save file
+        byte[] fileBytes = HuffmanFile.getBytes(tree, encoded);
+        System.out.println("filebytes: tree=" + (fileBytes.length - encoded.length) + " data=" + encoded.length);
+        writeBytesToFile("out/encoded.huff", fileBytes);
+        System.out.println(">> Saved to out/encoded.huff");
+
+        System.out.println("\n<< Reading from out/encoded.huff");
+        byte[] encodedFile = readBytesFromFile("out/encoded.huff");
+        
+        HuffmanParser parser = new HuffmanParser(encodedFile);
+        byte[] decoded = Huffman.decode(parser.getData(), parser.getHuffmanTree());
+        System.out.println("Decoded size: " + decoded.length + " bytes");
+
+        writeBytesToFile("out/decoded.huff.txt", decoded);
+        System.out.println(">> Saved to out/decoded.huff.txt");
+
     }
 
 }

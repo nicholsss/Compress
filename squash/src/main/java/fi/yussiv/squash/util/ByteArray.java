@@ -20,6 +20,12 @@ public class ByteArray {
         }
         array[size++] = b;
     }
+    
+    public void add(byte[] array) {
+        for (int i = 0; i < array.length; i++) {
+            add(array[i]);
+        }
+    }
 
     public void set(int index, byte b) {
         array[index] = b;

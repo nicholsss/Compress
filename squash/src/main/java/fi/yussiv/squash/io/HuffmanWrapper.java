@@ -5,7 +5,10 @@ import fi.yussiv.squash.domain.HuffmanTree;
 import java.io.Serializable;
 
 /**
- * I/O class used to save an encoded Huffman file.
+ * I/O class used to save an encoded Huffman file. 
+ * 
+ * @deprecated 
+ * Use HuffmanFile to save raw bytes instead
  */
 public class HuffmanWrapper implements Serializable {
     public byte[] data;

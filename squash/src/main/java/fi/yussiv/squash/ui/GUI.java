@@ -4,6 +4,8 @@ import fi.yussiv.squash.Huffman;
 import fi.yussiv.squash.LZW;
 import fi.yussiv.squash.domain.HuffmanTree;
 import fi.yussiv.squash.io.FileIO;
+import fi.yussiv.squash.io.HuffmanFile;
+import fi.yussiv.squash.io.HuffmanParser;
 import fi.yussiv.squash.io.HuffmanWrapper;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
@@ -14,6 +16,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -22,8 +25,10 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 /**
- * This is pretty much copy-pasted from
- * http://www.java2s.com/Code/Java/Swing-JFC/DemonstrationofFiledialogboxes.htm.
+ * A very crude GUI for demoing purposes.
+ *
+ * Much of this is copy-pasted from
+ * http://www.java2s.com/Code/Java/Swing-JFC/DemonstrationofFiledialogboxes.htm
  */
 public class GUI extends JFrame {
 
@@ -41,8 +46,10 @@ public class GUI extends JFrame {
         Container cp = getContentPane();
         cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));
 
-        JPanel optionPanel = new JPanel();
-        optionPanel.setLayout(new BoxLayout(optionPanel, BoxLayout.X_AXIS));
+        JPanel actionPanel = new JPanel();
+        actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.X_AXIS));
+        JPanel methodPanel = new JPanel();
+        methodPanel.setLayout(new BoxLayout(methodPanel, BoxLayout.X_AXIS));
         JPanel ioPanel = new JPanel();
         ioPanel.setLayout(new BoxLayout(ioPanel, BoxLayout.X_AXIS));
 
@@ -52,16 +59,16 @@ public class GUI extends JFrame {
         rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
 
         JPanel p = new JPanel();
-        open.addActionListener(new OpenL());
-        save.addActionListener(new SaveL());
+        open.addActionListener(new InputFileChooserListener());
+        save.addActionListener(new OutputFileChooserListener());
         open.setHorizontalAlignment(SwingConstants.LEFT);
         save.setHorizontalAlignment(SwingConstants.LEFT);
 
         leftPanel.add(open);
         rightPanel.add(save);
 
-        inputFile.setEditable(false);
-        outputFile.setEditable(false);
+//        inputFile.setEditable(false);
+//        outputFile.setEditable(false);
 
         leftPanel.add(inputFile);
         rightPanel.add(outputFile);
@@ -75,9 +82,6 @@ public class GUI extends JFrame {
         outputInfo = new JTextArea(5, 20);
         JScrollPane scrollPane2 = new JScrollPane(inputInfo);
         outputInfo.setEditable(false);
-
-        outputInfo.setText("output");
-        inputInfo.setText("input");
 
         leftPanel.add(inputInfo);
         rightPanel.add(outputInfo);
@@ -93,11 +97,16 @@ public class GUI extends JFrame {
         codingScheme.add(huffman);
         actions.add(encode);
         actions.add(decode);
-
-        optionPanel.add(encode);
-        optionPanel.add(decode);
-        optionPanel.add(lzw);
-        optionPanel.add(huffman);
+        encode.setSelected(true);
+        lzw.setSelected(true);
+        
+        actionPanel.add(new JLabel("Action: "));
+        actionPanel.add(encode);
+        actionPanel.add(decode);
+        
+        methodPanel.add(new JLabel("Method: "));
+        methodPanel.add(lzw);
+        methodPanel.add(huffman);
 
         ioPanel.add(leftPanel);
         ioPanel.add(rightPanel);
@@ -105,7 +114,8 @@ public class GUI extends JFrame {
         JButton exec = new JButton("Execute");
         exec.addActionListener(new ExecuteListener());
 
-        cp.add(optionPanel);
+        cp.add(actionPanel);
+        cp.add(methodPanel);
         cp.add(ioPanel);
         cp.add(exec);
 
@@ -113,50 +123,64 @@ public class GUI extends JFrame {
     }
 
     public void printInputText(String contents) {
-        inputInfo.setText(contents);
+        inputInfo.setText(inputInfo.getText() + contents + "\n");
     }
 
     public void printOutputText(String contents) {
-        outputInfo.setText(contents);
+        outputInfo.setText(outputInfo.getText() + contents + "\n");
     }
 
     class ExecuteListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
-            byte[] input = FileIO.readBytesFromFile(inputFile.getText());
+            byte[] input;
             byte[] output;
             HuffmanTree ht = null;
+
+            try {
+                input = FileIO.readBytesFromFile(inputFile.getText());
+            } catch (Exception ex) {
+                printInputText("Opening file failed: " + ex.getMessage());
+                return;
+            }
+
             if (encode.isSelected()) {
                 if (lzw.isSelected()) {
                     output = LZW.encode(input);
+                    printOutputText("Encoded size " + output.length + " bytes");
                 } else {
                     ht = Huffman.generateParseTree(input);
-                    output = Huffman.encode(input, ht);
+                    byte[] encoded = Huffman.encode(input, ht);
+                    output = HuffmanFile.getBytes(ht, encoded);
+                    printOutputText("Dictionary size " + (output.length - encoded.length - 12) + " bytes");
+                    printOutputText("Data size " + encoded.length + " bytes");
+                    printOutputText("Total size " + output.length + " bytes");
                 }
-                printOutputText("Encoded size " + output.length + " bytes");
             } else {
+                // Decoding
                 if (lzw.isSelected()) {
                     output = LZW.decode(input);
                 } else {
-                    HuffmanWrapper hw = (HuffmanWrapper) FileIO.readObjectFromFile(inputFile.getText());
-                    output = Huffman.decode(hw.data, hw.tree);
+                    try {
+                        HuffmanParser parser = new HuffmanParser(input);
+                        output = Huffman.decode(parser.getData(), parser.getHuffmanTree());
+                    } catch (Exception ex) {
+                        printOutputText("Parsing error: " + ex.getMessage());
+                        return;
+                    }
                 }
                 printOutputText("Decoded size " + output.length + " bytes");
             }
 
             try {
-                if (huffman.isSelected() && encode.isSelected()) {
-                    FileIO.writeObjectToFile(outputFile.getText(), new HuffmanWrapper(output, ht));
-                } else {
-                    FileIO.writeBytesToFile(outputFile.getText(), output);
-                }
+                FileIO.writeBytesToFile(outputFile.getText(), output);
             } catch (Exception ex) {
                 printOutputText("Could not write to file: " + ex.getMessage());
             }
         }
     }
 
-    class OpenL implements ActionListener {
+    class InputFileChooserListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
             JFileChooser c = new JFileChooser();
@@ -165,13 +189,17 @@ public class GUI extends JFrame {
             if (rVal == JFileChooser.APPROVE_OPTION) {
                 String filename = c.getSelectedFile().getAbsolutePath();
                 inputFile.setText(filename);
+                try {
                 byte[] input = FileIO.readBytesFromFile(filename);
                 printInputText("File size: " + input.length + " bytes");
+                } catch (Exception ex) {
+                    printInputText("Opening file failed: " + ex.getMessage());
+                }
             }
         }
     }
 
-    class SaveL implements ActionListener {
+    class OutputFileChooserListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
             JFileChooser c = new JFileChooser();

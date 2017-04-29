@@ -8,8 +8,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.io.IOUtils;
 
 /**
@@ -17,7 +15,11 @@ import org.apache.commons.io.IOUtils;
  */
 public class FileIO {
 
-    public static Object readObjectFromFile(String filename) {
+    /**
+     * @deprecated
+     * Use readBytesToFile() and HuffmanParser instead.
+     */
+    public static Object readObjectFromFile(String filename) throws FileNotFoundException, IOException, ClassNotFoundException {
         try (
                 FileInputStream file = new FileInputStream(filename);
                 BufferedInputStream buff = new BufferedInputStream(file);
@@ -27,15 +29,13 @@ public class FileIO {
             in.close();
 
             return obj;
-
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(FileIO.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException | ClassNotFoundException ex) {
-            Logger.getLogger(FileIO.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
+        } 
     }
 
+    /**
+     * @deprecated
+     * Use writeBytesToFile() in conjunction with HuffmanFile.getBytes().
+     */
     public static void writeObjectToFile(String filename, Object obj) throws FileNotFoundException, IOException {
         try (
                 FileOutputStream file = new FileOutputStream(filename);
@@ -47,7 +47,7 @@ public class FileIO {
         }
     }
 
-    public static byte[] readBytesFromFile(String filename) {
+    public static byte[] readBytesFromFile(String filename) throws FileNotFoundException, IOException {
         try (
                 FileInputStream file = new FileInputStream(filename);
                 BufferedInputStream buff = new BufferedInputStream(file);) {
@@ -55,13 +55,7 @@ public class FileIO {
             byte[] in = IOUtils.toByteArray(buff);
 
             return in;
-
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(FileIO.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(FileIO.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
+        } 
     }
 
     public static void writeBytesToFile(String filename, byte[] bytes) throws FileNotFoundException, IOException {
