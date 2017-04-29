@@ -25,90 +25,63 @@ public class Main {
     public static void lzwTimeTest() throws IOException {
         String filename = "test.txt";
         byte[] input = readBytesFromFile(filename);
-        System.out.println("");
-        System.out.println("| Dictionary size | input size | encoded size | encoded / input ratio | encoding time (us) |");
-        System.out.println("|-----------------|------------|--------------|--------------|--------------------|");
-        runAndPrintLZWResult(input, 1024);
-        runAndPrintLZWResult(input, 4096);
-        runAndPrintLZWResult(input, 16384);
-        runAndPrintLZWResult(input, 65536);
-        runAndPrintLZWResult(input, 262144);
-        runAndPrintLZWResult(input, 1048576);
+        
+        // dictionary sizes
+        printLZWTestHeader();
+        int x = 1;
+        for (int i = 0; i < 10; i++) {
+            runAndPrintLZWResult(input, 1024 * x);
+            x *= 2;
+        }
 
-        System.out.println("");
-        System.out.println("| Dictionary size | input size | encoded size | encoded / input ratio | encoding time (us) |");
-        System.out.println("|-----------------|------------|--------------|--------------|--------------------|");
-        runAndPrintLZWResult(truncateBytes(input, 1024), 65536);
-        runAndPrintLZWResult(truncateBytes(input, 2048), 65536);
-        runAndPrintLZWResult(truncateBytes(input, 4096), 65536);
-        runAndPrintLZWResult(truncateBytes(input, 8192), 65536);
-        runAndPrintLZWResult(truncateBytes(input, 16384), 65536);
-        runAndPrintLZWResult(truncateBytes(input, 32768), 65536);
-        runAndPrintLZWResult(truncateBytes(input, 65536), 65536);
-        runAndPrintLZWResult(truncateBytes(input, 131072), 65536);
-        runAndPrintLZWResult(truncateBytes(input, 262144), 65536);
-        runAndPrintLZWResult(truncateBytes(input, 524288), 65536);
-        runAndPrintLZWResult(truncateBytes(input, 1048576), 65536);
+        // different input lengths
+        printLZWTestHeader();
+        x = 1;
+        for (int i = 0; i < 10; i++) {
+            runAndPrintLZWResult(truncateBytes(input, 1024 * 2), 65536);
+            x *= 2;
+        }
 
-        System.out.println("");
-        System.out.println("| Dictionary size | input size | encoded size | encoded / input ratio | encoding time (us) |");
-        System.out.println("|-----------------|------------|--------------|--------------|--------------------|");
-        runAndPrintLZWResult(generateRandomInput(4069), 65536);
-        runAndPrintLZWResult(generateRandomInput(8192), 65536);
-        runAndPrintLZWResult(generateRandomInput(16384), 65536);
-        runAndPrintLZWResult(generateRandomInput(32768), 65536);
-        runAndPrintLZWResult(generateRandomInput(65536), 65536);
-        runAndPrintLZWResult(generateRandomInput(131072), 65536);
-        runAndPrintLZWResult(generateRandomInput(262144), 65536);
-        runAndPrintLZWResult(generateRandomInput(524288), 65536);
-        runAndPrintLZWResult(generateRandomInput(1048576), 65536);
-        runAndPrintLZWResult(generateRandomInput(2097152), 65536);
-        runAndPrintLZWResult(generateRandomInput(4194304), 65536);
-//
-//        System.out.println("");
-//        System.out.println("| Dictionary size | input size | encoded size | encoded / input ratio | encoding time (us) | ");
-//        System.out.println("|-----------------|------------|--------------|--------------|--------------------|");
-//        runAndPrintLZWResult(generateRandomInput(4069), 131072);
-//        runAndPrintLZWResult(generateRandomInput(8192), 131072);
-//        runAndPrintLZWResult(generateRandomInput(16384), 131072);
-//        runAndPrintLZWResult(generateRandomInput(32768), 131072);
-//        runAndPrintLZWResult(generateRandomInput(65536), 131072);
-//        runAndPrintLZWResult(generateRandomInput(131072), 131072);
-//        runAndPrintLZWResult(generateRandomInput(262144), 131072);
-//        runAndPrintLZWResult(generateRandomInput(524288), 131072);
-//        runAndPrintLZWResult(generateRandomInput(1048576), 131072);
-//        runAndPrintLZWResult(generateRandomInput(2097152), 131072);
+        // different input lengths with random data
+        printLZWTestHeader();
+        x = 1;
+        for (int i = 0; i < 10; i++) {
+            runAndPrintLZWResult(generateRandomInput(4069 * x), 65536);
+            x *= 2;
+        }
     }
 
     public static void huffTimeTest() throws IOException {
         String filename = "test.txt";
         byte[] input = readBytesFromFile(filename);
-        System.out.println("");
-        System.out.println("| input size | encoded size | encoded / input ratio | encoding time (us) | ");
-        System.out.println("|------------|--------------|--------------|--------------------|");
-        runAndPrintHuffResult(truncateBytes(input, 4069));
-        runAndPrintHuffResult(truncateBytes(input, 8192));
-        runAndPrintHuffResult(truncateBytes(input, 16384));
-        runAndPrintHuffResult(truncateBytes(input, 32768));
-        runAndPrintHuffResult(truncateBytes(input, 65536));
-        runAndPrintHuffResult(truncateBytes(input, 131072));
-        runAndPrintHuffResult(truncateBytes(input, 262144));
-        runAndPrintHuffResult(truncateBytes(input, 524288));
-        runAndPrintHuffResult(truncateBytes(input, 1048576));
+        
+        // different input lengths
+        printHuffTestHeader();
+        int x = 1;
+        for (int i = 0; i < 9; i++) {
+            runAndPrintHuffResult(truncateBytes(input, 4069 * x));
+            x *= 2;
+        }
 
+        // different input lengths with random data
+        printHuffTestHeader();
+        x = 1;
+        for (int i = 0; i < 10; i++) {
+            runAndPrintHuffResult(generateRandomInput(4069 * x));
+            x *= 2;
+        }
+    }
+    
+    public static void printLZWTestHeader() {
         System.out.println("");
-        System.out.println("| input size | encoded size | encoded / input ratio | encoding time (us) | ");
-        System.out.println("|------------|--------------|--------------|--------------------|");
-        runAndPrintHuffResult(generateRandomInput(4069));
-        runAndPrintHuffResult(generateRandomInput(8192));
-        runAndPrintHuffResult(generateRandomInput(16384));
-        runAndPrintHuffResult(generateRandomInput(32768));
-        runAndPrintHuffResult(generateRandomInput(65536));
-        runAndPrintHuffResult(generateRandomInput(131072));
-        runAndPrintHuffResult(generateRandomInput(262144));
-        runAndPrintHuffResult(generateRandomInput(524288));
-        runAndPrintHuffResult(generateRandomInput(1048576));
-        runAndPrintHuffResult(generateRandomInput(2097152));
+        System.out.println("| Dictionary size | input size | encoded size | encoded / input | time (us) |");
+        System.out.println("|-----------------|------------|--------------|-----------------|-----------|");
+    }
+    
+    public static void printHuffTestHeader() {
+        System.out.println("");
+        System.out.println("| input size | encoded size | encoded / input | time (us) | ");
+        System.out.println("|------------|--------------|-----------------|-----------|");
     }
 
     public static byte[] generateRandomInput(int size) {
