@@ -7,8 +7,6 @@ import java.util.NoSuchElementException;
  */
 public class LZWTrie {
 
-    private static final int CODEWORD_MAX_LENGTH = 24;
-
     private TrieNode[] root;
     private int size;
 
@@ -68,10 +66,6 @@ public class LZWTrie {
     }
 
     public boolean add(LZWCodeWord bytes, byte postfix) {
-        if (bytes.size() == CODEWORD_MAX_LENGTH) {
-//            System.err.println("maximum length reached!");
-            return false;
-        }
         TrieNode node = traverseTree(bytes);
         // the size of the trie acts as the next codeword for the trie node
         node.addChild(postfix, size++);

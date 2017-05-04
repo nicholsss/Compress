@@ -1,76 +1,60 @@
 package fi.yussiv.squash.domain;
 
+import fi.yussiv.squash.util.ByteArray;
 import java.util.Arrays;
 
 /**
- * Utitlity class to help with byte array manipulations. Array size limited to
- * MAX_SIZE elements.
+ * Utitlity class to help with byte array manipulations.
  */
 public class LZWCodeWord {
-
-    public static final int MAX_SIZE = 24;
-    private final byte[] array;
-    private int size;
+    
+    private ByteArray byteArray;
 
     public LZWCodeWord() {
-        this.array = new byte[MAX_SIZE];
-        this.size = 0;
+        this.byteArray = new ByteArray();
     }
 
     public boolean add(byte b) {
-        if (size < MAX_SIZE) {
-            array[size++] = b;
-            return true;
-        } else {
-            return false;
-        }
+        byteArray.add(b);
+        return true;
     }
 
     public byte get(int index) {
-        if (index >= size || index < 0) {
-            throw new ArrayIndexOutOfBoundsException();
-        }
-
-        return array[index];
-    }
-
-    public LZWCodeWord concatenate(byte b) {
-        LZWCodeWord concatenated = clone();
-        if (concatenated.add(b)) {
-            return concatenated;
-        } else {
-            return null;
-        }
+        return byteArray.get(index);
     }
 
     /**
-     * Doesn't really reset the array contents, only sets the size to zero, so
-     * it will be filled from the beginning next time.
+     * Returns a new code word with the supplied byte concatenated at the end.
+     * @param b
+     * @return 
      */
+    public LZWCodeWord concatenate(byte b) {
+        LZWCodeWord concatenated = clone();
+        concatenated.add(b);
+        return concatenated;
+    }
+
     public void clear() {
-        size = 0;
+        byteArray.clear();
     }
 
     public int size() {
-        return size;
+        return byteArray.size();
     }
 
     public byte[] getBytes() {
-        return array;
+        return byteArray.getBytes();
     }
 
     @Override
     public String toString() {
-        return Arrays.toString(array);
+        return Arrays.toString(byteArray.getBytes());
     }
 
     @Override
     public LZWCodeWord clone() {
         LZWCodeWord clone = new LZWCodeWord();
-        clone.size = this.size;
-        for (int i = 0; i < this.size; i++) {
-            clone.array[i] = this.array[i];
-        }
+        clone.byteArray = this.byteArray.duplicate();
         return clone;
     }
 }

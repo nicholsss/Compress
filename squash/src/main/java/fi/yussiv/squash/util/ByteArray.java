@@ -20,7 +20,7 @@ public class ByteArray {
         }
         array[size++] = b;
     }
-    
+
     public void add(byte[] array) {
         for (int i = 0; i < array.length; i++) {
             add(array[i]);
@@ -51,4 +51,29 @@ public class ByteArray {
         array = newArray;
     }
 
+    public byte get(int index) {
+        if (index < 0 || index >= size) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
+        return array[index];
+    }
+
+    public ByteArray duplicate() {
+        byte[] newArr = new byte[array.length];
+        for (int i = 0; i < array.length; i++) {
+            newArr[i] = array[i];
+        }
+        ByteArray duplicate = new ByteArray();
+        duplicate.array = newArr;
+        duplicate.size = this.size;
+        return duplicate;
+    }
+    
+    /**
+     * Doesn't really reset the array contents, only sets the size to zero, so
+     * it will be filled from the beginning next time.
+     */
+    public void clear() {
+        size = 0;
+    }
 }

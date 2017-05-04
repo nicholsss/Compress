@@ -10,11 +10,11 @@ import fi.yussiv.squash.util.LZWCodeWordArray;
  * strings.
  */
 public class LZW {
-
-    public static final int DEFAULT_DICTIONARY_SIZE = 65536;
+    // maximum dictionary size for 16-bit codeword
+    public static final int MAX_DICTIONARY_SIZE = (int) Math.pow(2,16); //65536;
 
     public static byte[] encode(byte[] input) {
-        return encode(input, DEFAULT_DICTIONARY_SIZE);
+        return encode(input, MAX_DICTIONARY_SIZE);
     }
 
     /**
@@ -53,7 +53,7 @@ public class LZW {
     }
 
     public static byte[] decode(byte[] input) {
-        return decode(input, DEFAULT_DICTIONARY_SIZE);
+        return decode(input, MAX_DICTIONARY_SIZE);
     }
 
     /**
@@ -70,14 +70,14 @@ public class LZW {
 
         ByteArray output = new ByteArray();
 
-        int index = Byte.toUnsignedInt(input[0]) << 16 | Byte.toUnsignedInt(input[1]) << 8 | Byte.toUnsignedInt(input[2]);
+        int index = Byte.toUnsignedInt(input[0]) << 8 | Byte.toUnsignedInt(input[1]);
         int old = index;
         addBytes(output, dictionary.get(index));
         byte postfix;
 
-        for (int j = 3; j < input.length; j += 3) {
+        for (int j = 2; j < input.length; j += 2) {
             // parse index from two bytes
-            index = Byte.toUnsignedInt(input[j]) << 16 | Byte.toUnsignedInt(input[j + 1]) << 8 | Byte.toUnsignedInt(input[j + 2]);
+            index = Byte.toUnsignedInt(input[j]) << 8 | Byte.toUnsignedInt(input[j + 1]);
             if (dictionary.size() > index) {
                 addBytes(output, dictionary.get(index));
 
@@ -112,10 +112,8 @@ public class LZW {
     }
 
     private static void addBytes(ByteArray list, int codeWord) {
-        int middle = codeWord >> 8;
-        int last = middle >> 8;
-        list.add((byte) last);
-        list.add((byte) middle);
+        int end = codeWord >> 8;
+        list.add((byte) end);
         list.add((byte) codeWord);
     }
 }
