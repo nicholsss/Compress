@@ -19,11 +19,11 @@ import java.util.Random;
 public class Test {
 
     public static void runTests() throws Exception {
-//        encodeHuff();
+        encodeHuff();
 //        encodeHuffOld();
-//        encodeLZW();
+        encodeLZW();
 //        lzwTimeTest();
-        huffTimeTest();
+//        huffTimeTest();
     }
 
     public static void lzwTimeTest() throws IOException {
