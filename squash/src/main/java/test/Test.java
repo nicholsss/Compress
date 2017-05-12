@@ -22,8 +22,8 @@ public class Test {
         encodeHuff();
 //        encodeHuffOld();
         encodeLZW();
-//        lzwTimeTest();
-//        huffTimeTest();
+        lzwTimeTest();
+        huffTimeTest();
     }
 
     public static void lzwTimeTest() throws IOException {
