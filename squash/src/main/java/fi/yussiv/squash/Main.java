@@ -1,8 +1,8 @@
 package fi.yussiv.squash;
 
+import fi.yussiv.squash.test.Test;
 import fi.yussiv.squash.ui.GUI;
 import static fi.yussiv.squash.ui.GUI.run;
-import test.Test;
 
 public class Main {
 

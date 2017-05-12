@@ -1,4 +1,4 @@
-package test;
+package fi.yussiv.squash.test;
 
 import fi.yussiv.squash.Huffman;
 import fi.yussiv.squash.LZW;
