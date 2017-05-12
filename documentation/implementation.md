@@ -5,15 +5,15 @@ The main datastructure the algorithm uses is a binary tree used in determining t
 
 The codewords generated with the parse tree have variable lengths. For this reason there is a dynamically sized codeword class (HuffmanCodeWord) that is used for the encoding process.
 
-In order to decode a Huffman coded file, the original parse tree needs to be saved along with the encoded payload. For this I save a byte representation of the tree from which it can be reconstructed for decoding. Essentially it just traverses through the tree in-order and inserts a 0 or 1 for leaf nodes and non-leaf nodes. Leaf nodes have a value associated with them, so after every 0 the byte value of the node is appended.
+In order to decode a Huffman coded file, the original parse tree needs to be saved along with the encoded payload. For this I save a byte representation of the tree from which it can be reconstructed for decoding. Essentially it just traverses through the tree in-order and inserts a 0 or 1 for leaf nodes and non-leaf nodes. Leaf nodes have a value associated with them, so after every 0 the byte value of the node is appended. For conveniency I have outputted the node type in a byte, which is clearly a waste of space.
 
 The output of the decoding and encoding is saved in a dynamically sized byte array (ByteArray).
 
 ### Lempel-Ziv-Welch
-The LZW algorithm uses a prefix trie. It is a tree structure where every node has an arbitrary amount of children. The child list of a node is a linked list. The codewords are 24 bytes long, which leads to a maximum dictionary size is about 16 million. This is a bit over the top, but convenient because they can be represented by concatenating three bytes.
+The LZW algorithm uses a prefix trie. It is a tree structure where every node has an arbitrary amount of children. The child list of a node is implemented as a linked list. The codewords are 16 bits long, which leads to a maximum dictionary size is about 65 thousand codewords. At one point I was using 24 bits for the codeword, but the compression efficiency was significantly worse, especially with random data. The prefixes in the trie are of arbitrary lenght, therefore they use a dynamically sized array.
 
 ### I/O
 Everything is done in-memory. All input and output is read and written as byte arrays using Apache IOUtils.
 
-### GUI
-The application has a very crude GUI mainly intended for demoing purposes.
+### UI
+The application has a very crude GUI mainly intended for demoing purposes. The performance tests can be run by adding "test" as a command line parameter when running the program.

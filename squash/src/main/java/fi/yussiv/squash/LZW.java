@@ -11,7 +11,7 @@ import fi.yussiv.squash.util.LZWCodeWordArray;
  */
 public class LZW {
     // maximum dictionary size for 16-bit codeword
-    public static final int MAX_DICTIONARY_SIZE = (int) Math.pow(2,16); //65536;
+    public static final int MAX_DICTIONARY_SIZE = (int) Math.pow(2,16);
 
     public static byte[] encode(byte[] input) {
         return encode(input, MAX_DICTIONARY_SIZE);

@@ -1,4 +1,4 @@
 .*
 !/.gitignore
 build/
-out/
+testing/tmp_*
