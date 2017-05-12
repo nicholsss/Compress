@@ -32,3 +32,9 @@ pitest {
     targetClasses = ['fi.yussiv.squash.*']
     outputFormats = ['XML', 'HTML']
 }
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'fi.yussiv.squash.Main'
+    }
+}
