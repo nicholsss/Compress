@@ -114,4 +114,4 @@ Filesizes of less than 4kb do not benefit much from LZW encoding. Both encoding 
 
 ![LZW encoding with random bytes](graph/lzw_rand.png)
 
-The performance of the LZW is quite terrible with random data. Processing time is within n*log(n) but the compression ratio is poor to say the least.
+The performance of the LZW is quite terrible with random data. Processing time does not degrade but the compression ratio is poor to say the least.
